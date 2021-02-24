@@ -1,5 +1,5 @@
 #Convert uplynk channel schedule to EPG
-import urllib2, urllib, zlib, hmac, hashlib, time, json, datetime, base64, csv
+import  urllib, zlib, hmac, hashlib, time, json, datetime, base64, csv
 import configparser
 from pprint import pprint
 import boto3
@@ -131,16 +131,16 @@ def get_schedule():
 
     x = call_api(endpoint, method='get')
     for i in x['items']:
-        if i['content_type'] == 'asset':
+        if i['content_type'] == 'asset' or 'slicer':
             ci = i['content_id']
             title = i['desc']
             start = i['start']
             duration = i['dur']
-            
+            content_type = i['content_type']            
             #Channel SubElement
             channel = xml.SubElement(root, "Channel")
             #Add channel details as channel metadata and then pull from api to fill in element details
-            xml.SubElement(channel, 'Channel', stationId='NULL', chanelNumber='NULL', callSign="NULL", network='NULL', broacastType="digital", gmtOffset='-8', observeDls='true')
+            xml.SubElement(channel, 'Channel', stationId='NULL', channelNumber='NULL', callSign="NULL", network='NULL', broacastType="digital", gmtOffset='-8', observeDls='true')
 
             #Show SubElement
             show = xml.SubElement(root, 'Show')
@@ -148,7 +148,7 @@ def get_schedule():
             xml.SubElement(show, 'Show', startTime=start, duration=str(duration), stereo="N", cc="N", sap="N", madeForTv="N", letterbox="N", repeat="Y", howCurrent="Replay", hdtv="N", year="", website="")
             xml.SubElement(show, 'Title').text = title
             xml.SubElement(show, 'VMP_Asset_ID').text = ci
-            xml.SubElement(show, 'Showtype').text = 'News'
+            xml.SubElement(show, 'contentType').text = content_type
             xml.SubElement(show, 'DisplayGenre').text = 'News'
             xml.SubElement(show, 'Rating').text = 'Rating'
         
